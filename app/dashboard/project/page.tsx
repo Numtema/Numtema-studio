@@ -5,6 +5,7 @@ import { PlusIcon, DownloadIcon, FilterIcon } from "lucide-react"
 import { AgentCard } from "@/components/dashboard/agent-card"
 import { TracesList } from "@/components/dashboard/traces-list"
 import { ProjectMetrics } from "@/components/dashboard/project-metrics"
+import Link from "next/link"
 
 export default function ProjectPage() {
   return (
@@ -19,10 +20,12 @@ export default function ProjectPage() {
             <DownloadIcon className="mr-2 h-4 w-4" />
             Export
           </Button>
-          <Button className="bg-[#6C5CE7] hover:bg-[#6C5CE7]/90 text-white">
-            <PlusIcon className="mr-2 h-4 w-4" />
-            New Agent
-          </Button>
+          <Link href="/dashboard/agents/new">
+            <Button className="bg-[#6C5CE7] hover:bg-[#6C5CE7]/90 text-white">
+              <PlusIcon className="mr-2 h-4 w-4" />
+              New Agent
+            </Button>
+          </Link>
         </div>
       </div>
 
@@ -90,10 +93,12 @@ export default function ProjectPage() {
               </Button>
               <span className="text-sm text-muted-foreground">Showing 2 agents</span>
             </div>
-            <Button className="bg-[#6C5CE7] hover:bg-[#6C5CE7]/90 text-white">
-              <PlusIcon className="mr-2 h-4 w-4" />
-              New Agent
-            </Button>
+            <Link href="/dashboard/agents/new">
+              <Button className="bg-[#6C5CE7] hover:bg-[#6C5CE7]/90 text-white">
+                <PlusIcon className="mr-2 h-4 w-4" />
+                New Agent
+              </Button>
+            </Link>
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">

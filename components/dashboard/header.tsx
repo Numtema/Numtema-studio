@@ -1,50 +1,83 @@
-import Link from "next/link"
+"use client"
+import { useAuth } from "@/components/providers/auth-provider"
 import { Button } from "@/components/ui/button"
-import { LionIcon } from "@/components/lion-icon"
-import { CalendarIcon } from "lucide-react"
-import { ThemeToggle } from "@/components/theme-toggle"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Bell, Search, Menu } from "lucide-react"
+import { Input } from "@/components/ui/input"
 
 export function DashboardHeader() {
+  const { user, logout } = useAuth()
+
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background">
-      <div className="flex h-14 items-center px-4">
-        <Link href="/dashboard" className="flex items-center gap-2">
-          <LionIcon className="h-6 w-6" />
-          <span className="text-base font-nasalization">Nümtema Studio</span>
-        </Link>
-        <div className="ml-4 flex items-center gap-2">
-          <Button variant="ghost" size="sm" className="h-8 text-sm font-normal">
-            Dashboard
+    <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8 dark:border-gray-800 dark:bg-gray-900">
+      <button type="button" className="-m-2.5 p-2.5 text-gray-700 lg:hidden dark:text-gray-300">
+        <span className="sr-only">Open sidebar</span>
+        <Menu className="h-6 w-6" aria-hidden="true" />
+      </button>
+
+      <div className="h-6 w-px bg-gray-200 lg:hidden dark:bg-gray-800" aria-hidden="true" />
+
+      <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
+        <form className="relative flex flex-1" action="#" method="GET">
+          <label htmlFor="search-field" className="sr-only">
+            Search
+          </label>
+          <Search
+            className="pointer-events-none absolute inset-y-0 left-0 h-full w-5 text-gray-400"
+            aria-hidden="true"
+          />
+          <Input
+            id="search-field"
+            className="block h-full w-full border-0 py-0 pl-8 pr-0 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm dark:text-gray-100 dark:placeholder:text-gray-500"
+            placeholder="Search..."
+            type="search"
+            name="search"
+          />
+        </form>
+        <div className="flex items-center gap-x-4 lg:gap-x-6">
+          <Button variant="ghost" size="icon">
+            <span className="sr-only">View notifications</span>
+            <Bell className="h-6 w-6" aria-hidden="true" />
           </Button>
-          <Button variant="ghost" size="sm" className="h-8 text-sm font-normal">
-            Traces
-          </Button>
-        </div>
-        <div className="ml-auto flex items-center gap-4">
-          <ThemeToggle />
-          <div className="flex items-center gap-2 rounded-md border bg-background px-3 py-1.5">
-            <CalendarIcon className="h-4 w-4 text-muted-foreground" />
-            <span className="text-xs font-normal">April 23rd, 2025 - May 23rd, 2025</span>
-          </div>
-          <div className="flex items-center gap-2 rounded-md border bg-background px-3 py-1.5">
-            <span className="text-xs font-normal">Default Project</span>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="h-4 w-4"
-            >
-              <path d="m6 9 6 6 6-6" />
-            </svg>
-          </div>
+
+          <div className="hidden lg:block lg:h-6 lg:w-px lg:bg-gray-200 dark:lg:bg-gray-800" aria-hidden="true" />
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                <Avatar className="h-8 w-8">
+                  <AvatarImage src={user?.avatar || "/placeholder.svg"} alt={user?.name} />
+                  <AvatarFallback>{user?.name?.charAt(0)}</AvatarFallback>
+                </Avatar>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56" align="end" forceMount>
+              <DropdownMenuLabel className="font-normal">
+                <div className="flex flex-col space-y-1">
+                  <p className="text-sm font-medium leading-none">{user?.name}</p>
+                  <p className="text-xs leading-none text-muted-foreground">{user?.email}</p>
+                </div>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>Profile</DropdownMenuItem>
+              <DropdownMenuItem>Settings</DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={logout}>Log out</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
-    </header>
+    </div>
   )
 }
+
+// Export alias for compatibility
+export const Header = DashboardHeader
