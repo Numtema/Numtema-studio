@@ -4,6 +4,19 @@ import { useEffect, useState } from "react"
 import { X } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { cn } from "@/lib/utils"
+import type { ReactElement } from "react"
+
+export interface ToastProps {
+  id: string
+  title?: string
+  description?: string
+  variant?: "default" | "destructive" | "success"
+  action?: ToastActionElement
+}
+
+export type ToastActionElement = ReactElement<{
+  altText: string
+}>
 
 export function Toaster() {
   const { toasts, dismiss } = useToast()
