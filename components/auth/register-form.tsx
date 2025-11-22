@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -9,6 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { useToast } from "@/hooks/use-toast"
+import { createClient } from "@/lib/supabase/client"
 
 export function RegisterForm() {
   const [isLoading, setIsLoading] = useState(false)
@@ -21,11 +21,11 @@ export function RegisterForm() {
   const [errors, setErrors] = useState<Record<string, string>>({})
   const router = useRouter()
   const { toast } = useToast()
+  const supabase = createClient()
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
-    // Effacer l'erreur lorsque l'utilisateur modifie le champ
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }))
     }
@@ -51,34 +51,36 @@ export function RegisterForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-
     if (!validateForm()) return
 
     setIsLoading(true)
 
     try {
-      const response = await fetch("/api/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
-          password: formData.password,
-        }),
+      // 1. Sign up with Supabase Auth
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+        options: {
+          data: {
+            full_name: formData.name,
+          },
+        },
       })
 
-      const data = await response.json()
+      if (authError) throw authError
 
-      if (!response.ok) {
-        throw new Error(data.error || "Une erreur est survenue lors de l'inscription")
+      if (authData.user) {
+        // 2. Optional: Create profile in custom User table if needed
+        // We can do this via a fetch to our API, or rely on the User object metadata
+        // For now, we'll just redirect as the auth is successful
+
+        toast({
+          title: "Inscription réussie",
+          description: "Veuillez vérifier votre email pour confirmer votre compte.",
+        })
+
+        router.push("/login")
       }
-
-      toast({
-        title: "Inscription réussie",
-        description: "Vous pouvez maintenant vous connecter",
-      })
-
-      router.push("/login")
     } catch (error) {
       console.error("Erreur d'inscription:", error)
       toast({

@@ -7,18 +7,21 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
+import { useToast } from "@/hooks/use-toast"
+import { createClient } from "@/lib/supabase/client"
 import { useAuth } from "@/components/AuthProvider"
 
 export default function LoginPage() {
   const router = useRouter()
-  const { login, isAuthenticated } = useAuth()
   const [isLoading, setIsLoading] = useState(false)
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   })
+  const { toast } = useToast()
+  const supabase = createClient()
+  const { isAuthenticated } = useAuth()
 
-  // Rediriger si déjà connecté
   useEffect(() => {
     if (isAuthenticated) {
       router.push("/dashboard")
@@ -30,33 +33,32 @@ export default function LoginPage() {
     setIsLoading(true)
 
     try {
-      // Simulation d'une connexion
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      const { error } = await supabase.auth.signInWithPassword({
+        email: formData.email,
+        password: formData.password,
+      })
 
-      if (formData.email && formData.password) {
-        login({
-          id: "1",
-          name: "Utilisateur",
-          email: formData.email,
-          image: "/placeholder.svg?height=40&width=40",
-        })
-        router.push("/dashboard")
+      if (error) {
+        throw error
       }
+
+      toast({
+        title: "Connexion réussie",
+        description: "Bienvenue sur votre tableau de bord",
+      })
+
+      router.push("/dashboard")
+      router.refresh()
     } catch (error) {
       console.error("Erreur de connexion:", error)
+      toast({
+        title: "Erreur",
+        description: error instanceof Error ? error.message : "Identifiants invalides",
+        variant: "destructive",
+      })
     } finally {
       setIsLoading(false)
     }
-  }
-
-  const handleDemoLogin = () => {
-    login({
-      id: "demo",
-      name: "Utilisateur Demo",
-      email: "demo@numtema.com",
-      image: "/placeholder.svg?height=40&width=40",
-    })
-    router.push("/dashboard")
   }
 
   return (
@@ -73,7 +75,7 @@ export default function LoginPage() {
               <Input
                 id="email"
                 type="email"
-                placeholder="demo@numtema.com"
+                placeholder="votre@email.com"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 required
@@ -94,23 +96,6 @@ export default function LoginPage() {
               {isLoading ? "Connexion..." : "Se connecter"}
             </Button>
           </form>
-
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">Ou</span>
-            </div>
-          </div>
-
-          <Button onClick={handleDemoLogin} variant="outline" className="w-full">
-            🚀 Connexion Demo
-          </Button>
-
-          <div className="text-center text-sm text-gray-600 dark:text-gray-400">
-            Mode démo - Aucune authentification réelle requise
-          </div>
         </CardContent>
       </Card>
     </div>

@@ -1,21 +1,7 @@
-import type { NextAuthOptions } from "next-auth"
+import type { AuthOptions } from "next-auth"
 
-export const authOptions: NextAuthOptions = {
-  providers: [
-    // Add your auth providers here
-    // For now, this is a placeholder configuration
-  ],
-  pages: {
-    signIn: "/login",
-    signOut: "/",
-  },
-  callbacks: {
-    async session({ session, token }) {
-      return session
-    },
-    async jwt({ token, user }) {
-      return token
-    },
-  },
-  secret: process.env.NEXTAUTH_SECRET,
+// This file is kept for backward compatibility but marked as deprecated
+// We are migrating to Supabase Auth
+export const authOptions: AuthOptions = {
+  providers: [],
 }
